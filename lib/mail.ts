@@ -5,10 +5,11 @@ const transporter = nodemailer.createTransport({
   service: "hotmail",
   host: "smtp-mail.outlook.com",
   port: 587,
+  pool: true,
   secure: false, // true for 465, false for other ports
   auth: {
-    user: "salman.aboaraj@hotmail.com",
-    pass: "Mirnaaboaraj",
+    user: "salman.aboaraj@outlook.com",
+    pass: "Mirnaaboaraj93",
   },
   tls: {
     // do not fail on invalid certs
@@ -19,7 +20,7 @@ const transporter = nodemailer.createTransport({
 export async function sendVerificationEmail(email: string, token: string) {
   const verificationUrl = `http://localhost:3000/api/verification/${token}`; // Nowy format URL
   await transporter.sendMail({
-    from: '"AlWathba" <salman.aboaraj@hotmail.com>',
+    from: '"AlWathba" <salman.aboaraj@outlook.com>',
     to: email,
     subject: "Verify Your Email",
     html: `Please click on the following link to verify your email: <a href="${verificationUrl}">${verificationUrl}</a>`,
@@ -27,9 +28,11 @@ export async function sendVerificationEmail(email: string, token: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const resetPasswordUrl = `http://localhost:3000/api/resetpass/${encodeURIComponent(token)}`;
+  const resetPasswordUrl = `http://localhost:3000/api/resetpass/${encodeURIComponent(
+    token
+  )}`;
   await transporter.sendMail({
-    from: '"AlWathba" <salman.aboaraj@hotmail.com>',
+    from: '"AlWathba" <salman.aboaraj@outlook.com>',
     to: email,
     subject: "Password Reset Request",
     html: `We received a request to reset your password for our app. Please click on the following link to reset your password: <a href="${resetPasswordUrl}">Reset Password</a>. If you did not request a password reset, please ignore this email.`,
