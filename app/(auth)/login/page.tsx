@@ -80,7 +80,7 @@ export default  function Home() {
       <div className="hidden lg:block lg:w-1/2 bg-[#990707]">
         <div className="relative h-full">
         <Image
-      src="/logo.jpg"
+      src="/Logo.jpg"
       fill={true}
       alt="ALWATHBA SPORT CLUB"
     />
