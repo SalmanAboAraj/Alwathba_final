@@ -13,12 +13,14 @@ const transporter = nodemailer.createTransport({
   },
   tls: {
     // do not fail on invalid certs
-    rejectUnauthorized: false,
+    //rejectUnauthorized: false,
+    ciphers: "SSLv3",
   },
 });
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const verificationUrl = `http://localhost:3000/api/verification/${token}`; // Nowy format URL
+  console.log("sss");
+  const verificationUrl = `https://alwathba.vercel.app/api/verification/${token}`; // Nowy format URL
   await transporter.sendMail({
     from: '"AlWathba" <salman.aboaraj@outlook.com>',
     to: email,
@@ -28,7 +30,7 @@ export async function sendVerificationEmail(email: string, token: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const resetPasswordUrl = `http://localhost:3000/api/resetpass/${encodeURIComponent(
+  const resetPasswordUrl = `https://alwathba.vercel.app/api/resetpass/${encodeURIComponent(
     token
   )}`;
   await transporter.sendMail({
