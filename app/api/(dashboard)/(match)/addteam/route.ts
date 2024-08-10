@@ -1,5 +1,5 @@
-import { db } from "@/server/db";
-import { team } from "@/server/db/schema";
+import { db } from "../../../../../server/db";
+import { team } from "../../../../../server/db/schema";
 import { join } from "path";
 import { stat, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,6 +10,22 @@ const takeUniqueOrThrow = <T extends any[]>(values: T): T[number] => {
     throw new Error("Found non unique or inexistent value");
   return values[0]!;
 };
+
+export async function GET() {
+  try {
+    const teams = await db
+      .select({ name: team.name,id:team.id })
+      .from(team);
+    return NextResponse.json(teams);
+  } catch (e) {
+    console.error("Error while trying to update user information\n", e);
+    return NextResponse.json(
+      { error: "Something went wrong." },
+      { status: 500 },
+    );
+  }
+}
+
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
