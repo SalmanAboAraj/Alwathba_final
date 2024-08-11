@@ -9,7 +9,7 @@ const takeUniqueOrThrow = <T extends any[]>(values: T): T[number] => {
 };
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   try {
     const matchId = parseInt(params.id, 10);
@@ -18,18 +18,27 @@ export async function GET(
       .from(match)
       .where(eq(match.id, matchId))
       .then(takeUniqueOrThrow);
+    const test = await db.query.match.findMany({
+      with: {
+        team: true,
+        court: true,
+        championship: true,
+        matchState: true,
+      },
+      where: eq(match.id, matchId),
+    });
     const eventRecords = await db
       .select()
       .from(eventOfMatch)
       .where(eq(eventOfMatch.matchId, matchId))
       .orderBy(desc(eventOfMatch.createdAt));
 
-    return NextResponse.json({ matchRecord, eventRecords });
+    return NextResponse.json({ matchRecord, eventRecords, test });
   } catch (e) {
     console.error("Error while trying to update user information\n", e);
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
