@@ -13,19 +13,16 @@ const takeUniqueOrThrow = <T extends any[]>(values: T): T[number] => {
 
 export async function GET() {
   try {
-    const teams = await db
-      .select({ name: team.name,id:team.id })
-      .from(team);
+    const teams = await db.select({ name: team.name, id: team.id }).from(team);
     return NextResponse.json(teams);
   } catch (e) {
     console.error("Error while trying to update user information\n", e);
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
-
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -51,18 +48,18 @@ export async function POST(request: NextRequest) {
         } else {
           console.error(
             "Error while trying to create directory when uploading a file\n",
-            e,
+            e
           );
           return NextResponse.json(
             { error: "Something went wrong." },
-            { status: 500 },
+            { status: 500 }
           );
         }
       }
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
       const filename = `${image.name.replace(
         /\.[^/.]+$/,
-        "",
+        ""
       )}-${uniqueSuffix}.${mime.getExtension(image.type)}`;
       await writeFile(`${uploadDir}/${filename}`, buffer);
       const fileUrl = `${relativeUploadDir}/${filename}`;
@@ -74,12 +71,15 @@ export async function POST(request: NextRequest) {
 
       await db.insert(team).values(newteamRow);
       return NextResponse.json({ message: "team created successfully" });
+    } else {
+      await db.insert(team).values({ name: teamRow.name });
+      return NextResponse.json({ message: "team created successfully" });
     }
   } catch (e) {
     console.error("Error while trying to update user information\n", e);
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -33,14 +33,14 @@ export const user = createTable("user", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   resetPasswordToken: varchar("resetPasswordToken", { length: 256 }).default(
-    sql`NULL`,
+    sql`NULL`
   ),
   tokenCreatedAt: timestamp("tokenCreatedAt").default(sql`NULL`),
   verificationToken: varchar("verificationToken", { length: 256 }).default(
-    sql`NULL`,
+    sql`NULL`
   ),
   verificationTokenCreationAt: timestamp("verificationTokenCreationAt").default(
-    sql`NULL`,
+    sql`NULL`
   ),
   verificated: boolean("verificated").notNull().default(false),
 });
@@ -91,7 +91,7 @@ export const characterizationRelations = relations(
   characterization,
   ({ many }) => ({
     characterization: many(admin),
-  }),
+  })
 );
 
 export const player = createTable("player", {
@@ -161,7 +161,7 @@ export const matchStateRelations = relations(matchState, ({ many }) => ({
 export const team = createTable("team", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 256 }).notNull().unique(),
-  logoPath: varchar("logoPath", { length: 256 }).notNull(),
+  logoPath: varchar("logoPath", { length: 256 }),
 });
 
 export const teamRelations = relations(team, ({ many }) => ({
@@ -346,7 +346,7 @@ export const classificationRelations = relations(
   classification,
   ({ many }) => ({
     productClassification: many(productClassification),
-  }),
+  })
 );
 
 export const size = createTable("size", {
@@ -414,5 +414,5 @@ export const productClassificationRelations = relations(
       fields: [productClassification.sizeId],
       references: [size.id],
     }),
-  }),
+  })
 );

@@ -16,12 +16,12 @@ export async function GET() {
       orderBy: asc(match.matchDate),
     });
 
-    return NextResponse.json(matches);
+    return NextResponse.json({ matches: matches });
   } catch (e) {
     console.error("Error while trying to update user information\n", e);
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

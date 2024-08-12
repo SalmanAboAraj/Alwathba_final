@@ -1,22 +1,17 @@
 import { db } from "@/server/db";
-import { admin, player, userMedia } from "@/server/db/schema";
-import mime from "mime";
-import { join } from "path";
-import { stat, mkdir, writeFile } from "fs/promises";
+import { admin, userMedia } from "@/server/db/schema";
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
-import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
 const takeUniqueOrThrow = <T extends any[]>(values: T): T[number] => {
   if (values.length !== 1)
     throw new Error("Found non unique or inexistent value");
   return values[0]!;
 };
-
-// return imagepath from userMedia table using get
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   try {
     const adminId = parseInt(params.id, 10);
@@ -37,46 +32,42 @@ export async function GET(
     console.error("Error while trying to get userMedia\n", e);
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   const formData = await req.formData();
-  const image = formData.get("imagePath") as File;
-  const buffer = Buffer.from(await image.arrayBuffer());
-  const now = new Date();
-  const formattedDate = now.toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  const relativeUploadDir = `/adminmedia/${formattedDate.replace(/[\/\\]/g, "-")}`;
+  const file = formData.get("imagePath") as Blob;
 
-  const uploadDir = join(process.cwd(), "public", relativeUploadDir);
-
-  try {
-    await stat(uploadDir);
-  } catch (e: any) {
-    if (e.code === "ENOENT") {
-      await mkdir(uploadDir, { recursive: true });
-    } else {
-      console.error(
-        "Error while trying to create directory when uploading a file\n",
-        e,
-      );
-      return NextResponse.json(
-        { error: "Something went wrong." },
-        { status: 500 },
-      );
-    }
+  if (!file) {
+    return NextResponse.json({ message: "No file uploaded" }, { status: 400 });
   }
-
   try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "uploads" },
+        (error, result) => {
+          if (error) {
+            reject(new Error(error.message));
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      uploadStream.end(buffer);
+    });
     const adminId = parseInt(params.id, 10);
     const adminRecord = await db
       .select()
@@ -84,47 +75,30 @@ export async function POST(
       .where(eq(admin.id, adminId))
       .then(takeUniqueOrThrow);
     const userId = adminRecord.userId;
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${image.name.replace(
-      /\.[^/.]+$/,
-      "",
-    )}-${uniqueSuffix}.${mime.getExtension(image.type)}`;
-    await writeFile(`${uploadDir}/${filename}`, buffer);
-    const fileUrl = `${relativeUploadDir}/${filename}`;
     const userMediaRow = {
       userId: userId,
-      imagePath: fileUrl,
+      imagePath: (result as any).secure_url,
     };
 
     const oldUserMediaRow = await db
       .select()
       .from(userMedia)
-      .where(eq(userMedia.userId, userMediaRow.userId))
-      .then(takeUniqueOrThrow);
+      .where(eq(userMedia.userId, userMediaRow.userId));
 
-    if (oldUserMediaRow) {
-      const oldImagePath = join(
-        process.cwd(),
-        "public",
-        oldUserMediaRow.imagePath,
-      );
-      if (fs.existsSync(oldImagePath)) {
-        await fs.unlinkSync(oldImagePath);
-      }
+    if (oldUserMediaRow[0]) {
       await db
         .update(userMedia)
-        .set({ imagePath: fileUrl })
+        .set({ imagePath: (result as any).secure_url })
         .where(eq(userMedia.userId, userMediaRow.userId));
     } else {
       await db.insert(userMedia).values(userMediaRow);
     }
-
     return NextResponse.json({ message: "File uploaded successfully." });
   } catch (e) {
     console.error("Error while trying to upload a file\n", e);
     return NextResponse.json(
       { error: "Something went wrong." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
