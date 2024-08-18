@@ -25,6 +25,7 @@ declare module "next-auth" {
       // ...other properties
       roleId: number;
       blocked: boolean;
+      verificated: boolean;
     } & DefaultSession["user"];
   }
 
@@ -33,6 +34,7 @@ declare module "next-auth" {
     id: number;
     roleId: number;
     blocked: boolean;
+    verificated: boolean;
   }
 }
 export const authOptions: NextAuthOptions = {
@@ -42,6 +44,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.roleId;
         token.blocked = user.blocked;
+        token.verificated = user.verificated;
       }
       return token;
     },
@@ -50,6 +53,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as number;
         session.user.roleId = token.role as number;
         session.user.blocked = token.blocked as boolean;
+        session.user.verificated = token.verificated as boolean;
       }
       return session;
     },

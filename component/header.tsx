@@ -3,8 +3,10 @@ import Link from "next/link";
 import { FaBars } from "react-icons/fa6";
 import Image from "next/image";
 import React from "react";
+import { signOut, useSession } from "next-auth/react";
 
 const Header = () => {
+  const { data: session } = useSession();
   const [open, setOpen] = React.useState<boolean>(false);
   return (
     <header className="bg-[#990707] py-2 " dir="rtl">
@@ -57,14 +59,41 @@ const Header = () => {
                 تواصل معنا
               </Link>
             </li>
-            <li>
-              <Link
-                className="bg-white text-[#990707] px-4 py-1 my-1 font-bold block rounded-full text-center"
-                href="/login"
-              >
-                تسجيل الدخول
-              </Link>
-            </li>
+
+            {!session && (
+              <li>
+                <Link
+                  className="bg-white text-[#990707] px-4 py-1 my-1 font-bold block rounded-full text-center"
+                  href="/login"
+                >
+                  تسجيل الدخول
+                </Link>
+              </li>
+            )}
+            {session && (
+              <>
+                <li>
+                  <div className="px-4 py-1 my-1 rounded-full flex justify-center items-center">
+                    <Image
+                      src="/logo.png"
+                      alt="User Image"
+                      width={30}
+                      height={30}
+                      className="rounded-full"
+                    />
+                  </div>
+                </li>
+                <li>
+                  <Link
+                    className="bg-white text-[#990707] px-4 py-1 my-1 font-bold block rounded-full text-center"
+                    href="/"
+                    onClick={() => signOut()}
+                  >
+                    تسجيل الخروج
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       </div>
