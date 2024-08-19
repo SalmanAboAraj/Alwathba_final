@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 
 
-export default function store() {
+export default function Store() {
       const [products,setProducts] = useState([]);
 
 useEffect(() => {

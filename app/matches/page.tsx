@@ -3,7 +3,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function matchs(){
+export default function Matchs(){
   const[matches,setMatches] = useState([])
 
 
