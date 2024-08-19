@@ -9,13 +9,16 @@ const Content = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [Fname, setFname] = useState("");
   const [Lname, setLname] = useState("");
-  const [gender, setGender] = useState("");
+  // const [gender, setGender] = useState("");
+  const [gender, setGender] = useState<boolean | null>(null);
+
   const [phone, setPhone] = useState("");
   const router = useRouter()
   async function handleSignup (){
     if(password === confirmPassword){
       try {
         const data = {
+          "roleid":1,
           "Fname":Fname,
           "Lname":Lname,
           "gender":gender,
@@ -60,11 +63,22 @@ return (
           placeholder="الاسم الأخير"
           onChange={(e)=>setLname(e.target.value)}
         />
-        <input
+        {/* <input
           className="flex h-10 text-black rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full text-right"
           placeholder="الجنس"
           onChange={(e)=>setGender(e.target.value)}
-        />
+        /> */}
+        <select
+  className="flex h-10 text-black rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full text-right"
+  onChange={(e) => setGender(e.target.value === "True")}
+  defaultValue=""
+>
+  <option value="" disabled hidden>
+    الجنس
+  </option>
+  <option value="True">ذكر</option>
+  <option value="False">أنثى</option>
+</select>
         <input
           className="flex h-10 text-black rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full text-right"
           placeholder="البريد الإلكتروني"
