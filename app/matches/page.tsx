@@ -27,7 +27,7 @@ export default function Matchs(){
 
 
    const showData = matches.map((matche,key)=>{
-    return(<tr className="border-b">
+    return(<tr key={key} className="border-b">
       <td className="px-4 py-3 font-medium">
         <div className="flex items-center gap-2">
           <Image
@@ -67,6 +67,7 @@ export default function Matchs(){
     </tr>
       
     )
+    console.log(key)
    })
 
     return (
