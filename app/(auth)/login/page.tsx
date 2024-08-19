@@ -10,8 +10,8 @@ type FormData = {
 };
 
 export default function Home() {
-  const searchParams = useSearchParams();
-  const callBackUrl = searchParams.get("callbackUrl");
+  //const searchParams = useSearchParams();
+  //const callBackUrl = searchParams.get("callbackUrl");
 
   const {
     register,
@@ -24,7 +24,7 @@ export default function Home() {
       email: data.email,
       password: data.password,
       redirect: true,
-      callbackUrl: callBackUrl ? callBackUrl : "/",
+      callbackUrl: "/",
     });
     console.log("Submitted...", res);
   };
